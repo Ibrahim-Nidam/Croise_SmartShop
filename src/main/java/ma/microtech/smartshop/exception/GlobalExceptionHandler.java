@@ -10,51 +10,50 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    record ErrorResponse (
+
+    record ErrorResponse(
             LocalDateTime timestamp,
             int status,
             String error,
             String message,
             String path
-    ){}
+    ) {}
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest req){
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
-                500,
-                "Internal Server Error",
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntime(RuntimeException ex, HttpServletRequest req){
-        int status = ex.getMessage().contains("Invalid Credentials") ? 401 : 400;
-        String error = status == 401 ? "Unauthorized" : "Bad request";
-
-        ErrorResponse response = new ErrorResponse(
+    private ErrorResponse buildError(HttpServletRequest request, int status, String error, String message) {
+        return new ErrorResponse(
                 LocalDateTime.now(),
                 status,
                 error,
-                ex.getMessage(),
-                req.getRequestURI()
+                message,
+                request.getRequestURI()
         );
-        return new ResponseEntity<>(response, HttpStatus.valueOf(status));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(buildError(request, 401, "Unauthorized", ex.getMessage()), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(buildError(request, 403, "Forbidden", ex.getMessage()), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntime(RuntimeException ex, HttpServletRequest request) {
+        if (ex.getMessage().contains("Invalid Credentials")) {
+            return new ResponseEntity<>(buildError(request, 401, "Unauthorized", "Invalid username or password"), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(buildError(request, 400, "Bad Request", ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> handleNotAuthenticated(IllegalStateException ex, HttpServletRequest req){
-        ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(),
-                403,
-                "Forbidden",
-                "You are not Authenticated",
-                req.getRequestURI()
-        );
-        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    public ResponseEntity<ErrorResponse> handleNotAuthenticated(IllegalStateException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(buildError(request, 403, "Forbidden", "You are not authenticated"), HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
+        return new ResponseEntity<>(buildError(request, 500, "Internal Server Error", "An unexpected error occurred"), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

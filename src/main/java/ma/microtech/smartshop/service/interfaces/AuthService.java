@@ -7,4 +7,6 @@ public interface AuthService {
     User login(String username, String password, HttpServletRequest req);
     void logout(HttpServletRequest req);
     User getCurrentUser(HttpServletRequest req);
+    boolean isAuthenticated(HttpServletRequest request);
+    boolean hasRole(HttpServletRequest request, String role);
 }
