@@ -50,4 +50,15 @@ public class AuthServiceImpl implements AuthService {
 
         return userRepository.findById(userId).orElse(null);
     }
+
+    @Override
+    public boolean isAuthenticated(HttpServletRequest request) {
+        return getCurrentUser(request) != null;
+    }
+
+    @Override
+    public boolean hasRole(HttpServletRequest request, String role) {
+        User user = getCurrentUser(request);
+        return user != null && role.equals(user.getRole().name());
+    }
 }
