@@ -56,10 +56,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(buildError(request, 403, "Forbidden", "You are not authenticated"), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
-        return new ResponseEntity<>(buildError(request, 500, "Internal Server Error", "An unexpected error occurred"), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
@@ -85,5 +81,11 @@ public class GlobalExceptionHandler {
         }
 
         return new ResponseEntity<>(buildError(request, 400, "Bad Request", message), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
+        ex.printStackTrace();
+        return new ResponseEntity<>(buildError(request, 500, "Internal Server Error", "An unexpected error occurred"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

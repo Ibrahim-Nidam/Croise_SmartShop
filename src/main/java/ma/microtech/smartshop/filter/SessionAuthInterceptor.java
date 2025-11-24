@@ -1,6 +1,5 @@
 package ma.microtech.smartshop.filter;
 
-import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -8,28 +7,21 @@ import ma.microtech.smartshop.entity.User;
 import ma.microtech.smartshop.exception.ForbiddenException;
 import ma.microtech.smartshop.exception.UnauthorizedException;
 import ma.microtech.smartshop.service.interfaces.AuthService;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-@Order(1)
 @RequiredArgsConstructor
-public class SessionAuthFilter implements Filter {
+public class SessionAuthInterceptor implements HandlerInterceptor {
     private final AuthService authService;
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
-            throws ServletException, IOException {
-
-        HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) resp;
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+                             Object handler) throws Exception {
         String path = request.getRequestURI();
 
         if(path.startsWith("/api/auth/") || path.equals("/")){
-            chain.doFilter(request, response);
-            return;
+            return true;
         }
 
         if(!authService.isAuthenticated(request)){
@@ -40,8 +32,7 @@ public class SessionAuthFilter implements Filter {
         request.setAttribute("currentUser", currentUser);
 
         if(authService.hasRole(request, "ADMIN")){
-            chain.doFilter(request, response);
-            return;
+            return true;
         }
 
         if(authService.hasRole(request, "CLIENT")){
@@ -50,7 +41,7 @@ public class SessionAuthFilter implements Filter {
                 throw new ForbiddenException("Access Denied for Client Role");
             }
         }
-        chain.doFilter(request, response);
+        return true;
     }
 
     private boolean isClientAllowedPath(String path, String method){
