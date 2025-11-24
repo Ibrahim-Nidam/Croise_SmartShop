@@ -45,4 +45,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.valueOf(status));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleNotAuthenticated(IllegalStateException ex, HttpServletRequest req){
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                403,
+                "Forbidden",
+                "You are not Authenticated",
+                req.getRequestURI()
+        );
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
 }
