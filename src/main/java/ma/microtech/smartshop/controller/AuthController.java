@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.entity.User;
 import ma.microtech.smartshop.service.interfaces.AuthService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,6 +15,7 @@ public class AuthController {
 
     record LoginRequest(String username, String password){}
     record LoginResponse(Long id, String username, String role){}
+    record LogoutResponse(String message){}
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletRequest req){
@@ -29,7 +27,10 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest req){
+        if(authService.getCurrentUser(req) == null){
+            throw new IllegalStateException();
+        }
         authService.logout(req);
-        return ResponseEntity.ok("Logged out successfully");
+        return ResponseEntity.ok(new LogoutResponse("Logged out successfully"));
     }
 }
