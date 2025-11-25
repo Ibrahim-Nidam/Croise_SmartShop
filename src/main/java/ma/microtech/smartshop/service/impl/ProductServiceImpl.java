@@ -1,10 +1,12 @@
 package ma.microtech.smartshop.service.impl;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.dto.product.ProductCreateDTO;
 import ma.microtech.smartshop.dto.product.ProductResponseDTO;
+import ma.microtech.smartshop.dto.product.ProductSearchCriteria;
 import ma.microtech.smartshop.dto.product.ProductUpdateDTO;
 import ma.microtech.smartshop.entity.Product;
 import ma.microtech.smartshop.exception.ForbiddenException;
@@ -12,7 +14,13 @@ import ma.microtech.smartshop.mapper.ProductMapper;
 import ma.microtech.smartshop.repository.ProductRepository;
 import ma.microtech.smartshop.service.interfaces.AuthService;
 import ma.microtech.smartshop.service.interfaces.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +60,26 @@ public class ProductServiceImpl implements ProductService {
         productMapper.updateEntityFromDTO(dto, product);
         product = productRepository.save(product);
         return productMapper.toResponseDTO(product);
+    }
+
+    @Override
+    public Page<Product> getProducts(ProductSearchCriteria criteria, Pageable pageable){
+        Specification<Product> spec = ((root, query, criteriaBuilder) ->{
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(criteriaBuilder.isFalse(root.get("deleted")));
+            if(criteria.name() != null && !criteria.name().isBlank()){
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
+                        "%" + criteria.name().toLowerCase() + "%"));
+            }
+
+            if(criteria.stock() != null){
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("stock"), criteria.stock()));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        });
+        return productRepository.findAll(spec, pageable);
     }
 }

@@ -17,13 +17,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,9 +35,6 @@ class ClientServiceImplTest {
 
     @Mock
     private AuthService authService;
-
-    @Mock
-    private BCryptPasswordEncoder passwordEncoder;
 
     @Mock
     private HttpServletRequest request;
@@ -61,7 +56,7 @@ class ClientServiceImplTest {
         mockUser = User.builder()
                 .id(1L)
                 .username("test@example.com")
-                .password("encodedPassword")
+                .password("plainPassword123")
                 .role(UserRole.ADMIN)
                 .build();
 
@@ -89,7 +84,6 @@ class ClientServiceImplTest {
     @Test
     void createClient_Success() {
         when(authService.hasRole(request, "ADMIN")).thenReturn(true);
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
         when(clientRepository.save(any(Client.class))).thenReturn(mockClient);
         when(clientMapper.toResponseDTO(any(Client.class))).thenReturn(responseDTO);
