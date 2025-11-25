@@ -45,6 +45,7 @@ public class SessionAuthInterceptor implements HandlerInterceptor {
     }
 
     private boolean isClientAllowedPath(String path, String method){
-        return path.matches("/api/clients/me");
+        return path.matches("/api/clients/me") ||
+                path.matches("/api/clients/me/orders");
     }
 }
