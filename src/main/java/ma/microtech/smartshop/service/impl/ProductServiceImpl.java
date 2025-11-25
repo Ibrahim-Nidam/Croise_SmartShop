@@ -82,4 +82,24 @@ public class ProductServiceImpl implements ProductService {
         });
         return productRepository.findAll(spec, pageable);
     }
+
+    @Override
+    @Transactional
+    public void deleteProduct(Long id){
+        checkAdmin();
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product Not Found"));
+        if (product.isDeleted()){
+            throw new RuntimeException("Product Already deleted");
+        }
+
+        boolean isUsedInOrders = productRepository.isUsedInAnyOrder(id);
+
+        if(isUsedInOrders){
+            product.setDeleted(true);
+            productRepository.save(product);
+        } else {
+            productRepository.delete(product);
+        }
+    }
 }
