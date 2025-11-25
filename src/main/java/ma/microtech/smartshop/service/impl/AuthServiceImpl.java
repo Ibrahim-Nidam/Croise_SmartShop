@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.entity.User;
 import ma.microtech.smartshop.repository.UserRepository;
 import ma.microtech.smartshop.service.interfaces.AuthService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,8 +18,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(()-> new RuntimeException("Invalid Credentials"));
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        if(!encoder.matches(password, user.getPassword())){
+        if(user.getPassword() == password){
             throw new RuntimeException("Invalid Credentials");
         }
 

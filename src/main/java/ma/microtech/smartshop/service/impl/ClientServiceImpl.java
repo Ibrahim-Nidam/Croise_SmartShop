@@ -17,7 +17,6 @@ import ma.microtech.smartshop.repository.ClientRepository;
 import ma.microtech.smartshop.repository.UserRepository;
 import ma.microtech.smartshop.service.interfaces.AuthService;
 import ma.microtech.smartshop.service.interfaces.ClientService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -29,7 +28,6 @@ public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
     private final AuthService authService;
-    private final BCryptPasswordEncoder passwordEncoder;
     private final HttpServletRequest request;
     private final ClientMapper clientMapper;
 
@@ -42,7 +40,7 @@ public class ClientServiceImpl implements ClientService {
 
         User user = User.builder()
                 .username(dto.email())
-                .password(passwordEncoder.encode(dto.password()))
+                .password(dto.password())
                 .role(UserRole.CLIENT)
                 .build();
 
