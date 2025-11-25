@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.dto.client.ClientCreateDTO;
 import ma.microtech.smartshop.dto.client.ClientResponseDTO;
 import ma.microtech.smartshop.dto.client.ClientUpdateDTO;
+import ma.microtech.smartshop.dto.order.OrderSummaryDTO;
+import ma.microtech.smartshop.entity.User;
+import ma.microtech.smartshop.repository.ClientRepository;
+import ma.microtech.smartshop.service.interfaces.AuthService;
 import ma.microtech.smartshop.service.interfaces.ClientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClientController {
     private final ClientService clientService;
+    private final AuthService authService;
+    private final ClientRepository clientRepository;
 
     @PostMapping
     public ResponseEntity<ClientResponseDTO> create(@Valid @RequestBody ClientCreateDTO dto){
@@ -46,5 +52,15 @@ public class ClientController {
     public ResponseEntity<Void> delete(@PathVariable Long id){
         clientService.deleteClient(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/orders")
+    public ResponseEntity<List<OrderSummaryDTO>> getClientOrders(@PathVariable Long id){
+        return ResponseEntity.ok(clientService.getClientOrderHistory(id));
+    }
+
+    @GetMapping("/me/orders")
+    public ResponseEntity<List<OrderSummaryDTO>> getMyOrderHistory(){
+        return ResponseEntity.ok(clientService.getMyOrderHistory());
     }
 }
