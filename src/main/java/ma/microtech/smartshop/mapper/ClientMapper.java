@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface ClientMapper {
     @Mapping(target = "tier", source = "tier")
@@ -16,6 +18,8 @@ public interface ClientMapper {
     @Mapping(target = "firstOrderDate", source = "firstOrderDate")
     @Mapping(target = "lastOrderDate", source = "lastOrderDate")
     ClientResponseDTO toResponseDTO(Client client);
+
+    List<ClientResponseDTO> toResponseDTOList(List<Client> clients);
 
     @InheritInverseConfiguration(name = "toResponseDTO")
     @Mapping(target = "id", ignore = true)
