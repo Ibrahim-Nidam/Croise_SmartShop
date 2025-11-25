@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.dto.client.ClientCreateDTO;
 import ma.microtech.smartshop.dto.client.ClientResponseDTO;
 import ma.microtech.smartshop.dto.client.ClientUpdateDTO;
+import ma.microtech.smartshop.dto.order.OrderSummaryDTO;
 import ma.microtech.smartshop.entity.Client;
 import ma.microtech.smartshop.entity.User;
 import ma.microtech.smartshop.enums.UserRole;
@@ -19,6 +20,7 @@ import ma.microtech.smartshop.service.interfaces.ClientService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -128,5 +130,43 @@ public class ClientServiceImpl implements ClientService {
         }
 
         clientRepository.delete(client);
+    }
+
+    @Override
+    public List<OrderSummaryDTO> getClientOrderHistory(Long clientId){
+        User currentUser = authService.getCurrentUser(request);
+        if(currentUser == null){
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client Not Found"));
+
+        boolean isAdmin = authService.hasRole(request, "ADMIN");
+        boolean isOwner = client.getUser() != null &&
+                client.getUser().getId().equals(currentUser.getId());
+
+        if(!isAdmin && !isOwner){
+            throw new ForbiddenException("You can view only your History");
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<OrderSummaryDTO> getMyOrderHistory(){
+        User currentUser = authService.getCurrentUser(request);
+        if(currentUser == null){
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if(authService.hasRole(request, "ADMIN")){
+            throw new ForbiddenException("Use admin endpoints to view client orders");
+        }
+
+        Client client = clientRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Your client profile not found"));
+
+        return getClientOrderHistory(client.getId());
     }
 }
