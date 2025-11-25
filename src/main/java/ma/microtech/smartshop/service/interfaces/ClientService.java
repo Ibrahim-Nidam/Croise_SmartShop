@@ -3,7 +3,7 @@ package ma.microtech.smartshop.service.interfaces;
 import ma.microtech.smartshop.dto.client.ClientCreateDTO;
 import ma.microtech.smartshop.dto.client.ClientResponseDTO;
 import ma.microtech.smartshop.dto.client.ClientUpdateDTO;
-import ma.microtech.smartshop.entity.Client;
+import ma.microtech.smartshop.dto.order.OrderSummaryDTO;
 
 import java.util.List;
 
@@ -14,4 +14,7 @@ public interface ClientService {
     List<ClientResponseDTO> getAllClients();
     ClientResponseDTO getClientById(Long id);
     void deleteClient(Long id);
+
+    List<OrderSummaryDTO> getClientOrderHistory(Long clientId);
+    List<OrderSummaryDTO> getMyOrderHistory();
 }
