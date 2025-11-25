@@ -19,6 +19,8 @@ import ma.microtech.smartshop.service.interfaces.ClientService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
@@ -90,4 +92,41 @@ public class ClientServiceImpl implements ClientService {
         return clientMapper.toResponseDTO(client);
     }
 
+    @Override
+    public List<ClientResponseDTO> getAllClients(){
+        if(!authService.hasRole(request, "ADMIN")){
+            throw new ForbiddenException("Only Admin can list Clients");
+        }
+
+        return clientMapper.toResponseDTOList(clientRepository.findAll());
+    }
+
+    @Override
+    public ClientResponseDTO getClientById(Long id){
+        if(!authService.hasRole(request, "ADMIN")){
+            throw new ForbiddenException("Only Admin can get Client");
+        }
+
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Client Not Found"));
+
+        return clientMapper.toResponseDTO(client);
+    }
+
+    @Override
+    @Transactional
+    public void deleteClient(Long id){
+        if(!authService.hasRole(request, "ADMIN")){
+            throw new ForbiddenException("Only Admin can delete Client");
+        }
+
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Client Not Found"));
+
+        if(client.getUser() != null){
+            userRepository.delete(client.getUser());
+        }
+
+        clientRepository.delete(client);
+    }
 }
