@@ -2,6 +2,7 @@ package ma.microtech.smartshop.service.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import ma.microtech.smartshop.config.AppConfig;
 import ma.microtech.smartshop.dto.order.*;
 import ma.microtech.smartshop.dto.orderItem.OrderItemRequestDTO;
 import ma.microtech.smartshop.entity.*;
@@ -16,6 +17,7 @@ import ma.microtech.smartshop.service.interfaces.OrderService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,8 @@ public class OrderServiceImpl implements OrderService {
     private final AuthService authService;
     private final OrderMapper orderMapper;
     private final HttpServletRequest request;
+    private final PromoCodeServiceImpl promoCodeService;
+    private final AppConfig appConfig;
 
     private void checkAdmin() {
         if (!authService.hasRole(request, "ADMIN")) {
@@ -106,6 +110,9 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal sousTotalHT = processOrderItems(order, dto.items());
 
         order.setSousTotalHT(sousTotalHT);
+
+        calculatesTotalAndDiscounts(order, client);
+
         order = orderRepository.save(order);
         orderItemRepository.saveAll(order.getItems());
 
@@ -145,5 +152,39 @@ public class OrderServiceImpl implements OrderService {
                 .pricePerUnitHT(product.getPricePerUnit())
                 .totalLigneHT(totalLigne)
                 .build();
+    }
+
+    private void calculatesTotalAndDiscounts(Order order, Client client){
+        BigDecimal sousTotalHT = order.getSousTotalHT();
+        BigDecimal tierDiscount = client.getTier().getDiscountPercentage();
+        BigDecimal promoDiscount = BigDecimal.ZERO;
+        String code = order.getCodePromo();
+
+        if (code != null && !code.isBlank()) {
+            if (!promoCodeService.isValidFormat(code)) {
+                throw new BusinessException("Invalid promo code format. Must be PROMO-XXXX (e.g. PROMO-2025)");
+            }
+            if (!promoCodeService.isUnused(code)) {
+                throw new BusinessException("This promo code has already been used: " + code);
+            }
+            promoDiscount = promoCodeService.getDiscountPercent(code);
+        }
+
+        BigDecimal totalDiscountPercentage = tierDiscount.add(promoDiscount);
+        BigDecimal montantRemise = sousTotalHT.multiply(totalDiscountPercentage)
+                .divide(BigDecimal.valueOf(100),2, RoundingMode.HALF_UP);
+
+        BigDecimal montantAfterRemise = sousTotalHT.subtract(montantRemise);
+
+        BigDecimal montantTVA = montantAfterRemise.multiply(appConfig.getTvaRate())
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal totalTTC = montantAfterRemise.add(montantTVA);
+
+        order.setRemisePourcentage(totalDiscountPercentage);
+        order.setMontantRemise(montantRemise);
+        order.setMontantTVA(montantTVA);
+        order.setTotalTTC(totalTTC);
+        order.setMontantRestant(totalTTC);
     }
 }

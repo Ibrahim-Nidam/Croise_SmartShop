@@ -68,11 +68,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        var fieldError = ex.getBindingResult().getFieldError();
         String errors = ex.getBindingResult()
                 .getAllErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
+
+        if (fieldError != null && fieldError.getField().equals("codePromo")) {
+            return new ResponseEntity<>(buildError(request, 422, "Unprocessable Entity", errors), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        if (fieldError != null && fieldError.getField().equals("items")) {
+            return new ResponseEntity<>(buildError(request, 422, "Unprocessable Entity", errors), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
 
         return new ResponseEntity<>(buildError(request, 400, "Validation Failed", errors), HttpStatus.BAD_REQUEST);
     }
