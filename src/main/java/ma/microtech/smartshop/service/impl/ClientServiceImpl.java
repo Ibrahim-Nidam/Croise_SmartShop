@@ -11,6 +11,7 @@ import ma.microtech.smartshop.entity.Client;
 import ma.microtech.smartshop.entity.User;
 import ma.microtech.smartshop.enums.UserRole;
 import ma.microtech.smartshop.exception.ForbiddenException;
+import ma.microtech.smartshop.exception.NotFoundException;
 import ma.microtech.smartshop.exception.UnauthorizedException;
 import ma.microtech.smartshop.mapper.ClientMapper;
 import ma.microtech.smartshop.repository.ClientRepository;
@@ -64,7 +65,7 @@ public class ClientServiceImpl implements ClientService {
         if(currentUser == null) throw new UnauthorizedException("Not authenticated");
 
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client Not Found"));
+                .orElseThrow(() -> new NotFoundException("Client Not Found"));
 
         if(authService.hasRole(request, "CLIENT")){
                 throw new ForbiddenException("Only admin can update profile");
@@ -108,7 +109,7 @@ public class ClientServiceImpl implements ClientService {
         }
 
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client Not Found"));
+                .orElseThrow(() -> new NotFoundException("Client Not Found"));
 
         return clientMapper.toResponseDTO(client);
     }
@@ -121,7 +122,7 @@ public class ClientServiceImpl implements ClientService {
         }
 
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client Not Found"));
+                .orElseThrow(() -> new NotFoundException("Client Not Found"));
 
         if(client.getUser() != null){
             userRepository.delete(client.getUser());
@@ -138,7 +139,7 @@ public class ClientServiceImpl implements ClientService {
         }
 
         Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client Not Found"));
+                .orElseThrow(() -> new NotFoundException("Client Not Found"));
 
         boolean isAdmin = authService.hasRole(request, "ADMIN");
         boolean isOwner = client.getUser() != null &&

@@ -56,10 +56,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(buildError(request, 403, "Forbidden", "You are not authenticated"), HttpStatus.FORBIDDEN);
     }
 
-
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
         return new ResponseEntity<>(buildError(request, 422, "Unprocessable Entity", ex.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(buildError(request, 404, "Not Found", ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
