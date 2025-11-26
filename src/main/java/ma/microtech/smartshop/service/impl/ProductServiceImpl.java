@@ -10,6 +10,7 @@ import ma.microtech.smartshop.dto.product.ProductSearchCriteria;
 import ma.microtech.smartshop.dto.product.ProductUpdateDTO;
 import ma.microtech.smartshop.entity.Product;
 import ma.microtech.smartshop.exception.ForbiddenException;
+import ma.microtech.smartshop.exception.NotFoundException;
 import ma.microtech.smartshop.mapper.ProductMapper;
 import ma.microtech.smartshop.repository.ProductRepository;
 import ma.microtech.smartshop.service.interfaces.AuthService;
@@ -51,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDTO updateProduct(Long id, ProductUpdateDTO dto){
         checkAdmin();
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Product Not Found"));
 
         if(product.isDeleted()){
             throw new RuntimeException("Cannot updated deleted Product");
@@ -88,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long id){
         checkAdmin();
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Product Not Found"));
         if (product.isDeleted()){
             throw new RuntimeException("Product Already deleted");
         }
