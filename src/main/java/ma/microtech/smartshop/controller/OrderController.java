@@ -4,12 +4,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.dto.order.OrderCreateRequestDTO;
 import ma.microtech.smartshop.dto.order.OrderResponseDTO;
+import ma.microtech.smartshop.enums.OrderStatus;
+import ma.microtech.smartshop.exception.BusinessException;
 import ma.microtech.smartshop.service.interfaces.OrderService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -21,5 +22,22 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponseDTO> create(@Valid @RequestBody OrderCreateRequestDTO dto){
         return ResponseEntity.ok(orderService.createOrder(dto));
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<OrderResponseDTO> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body){
+        String statusStr = body.get("status");
+        if (statusStr == null) {
+            throw new BusinessException("Field status is required");
+        }
+        OrderStatus newStatus;
+        try{
+            newStatus = OrderStatus.valueOf(statusStr.toUpperCase());
+        } catch (IllegalArgumentException ex){
+            throw new BusinessException("Invalid Status : " + statusStr);
+        }
+
+        OrderResponseDTO updated = orderService.updateOrderStatus(id, newStatus);
+        return ResponseEntity.ok(updated);
     }
 }
