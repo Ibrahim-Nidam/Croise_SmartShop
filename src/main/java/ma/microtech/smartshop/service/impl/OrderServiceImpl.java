@@ -191,6 +191,7 @@ public class OrderServiceImpl implements OrderService {
         order.setMontantTVA(montantTVA);
         order.setTotalTTC(totalTTC);
         order.setMontantRestant(totalTTC);
+        order.setMontantReserve(BigDecimal.ZERO);
     }
 
     @Override
@@ -227,7 +228,6 @@ public class OrderServiceImpl implements OrderService {
         clientRepository.save(client);
 
         order.setStatus(OrderStatus.CONFIRMED);
-        order.setMontantRestant(BigDecimal.ZERO);
     }
 
     private void cancelOrder(Order order){

@@ -65,4 +65,8 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
+
+    @Column(precision = 12, scale = 2)
+    @Builder.Default
+    private BigDecimal montantReserve = BigDecimal.ZERO;
 }
