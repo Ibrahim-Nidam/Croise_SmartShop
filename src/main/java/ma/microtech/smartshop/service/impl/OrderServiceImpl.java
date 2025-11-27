@@ -1,11 +1,13 @@
 package ma.microtech.smartshop.service.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.config.AppConfig;
 import ma.microtech.smartshop.dto.order.*;
 import ma.microtech.smartshop.dto.orderItem.OrderItemRequestDTO;
 import ma.microtech.smartshop.entity.*;
+import ma.microtech.smartshop.enums.CustomerTier;
 import ma.microtech.smartshop.enums.OrderStatus;
 import ma.microtech.smartshop.exception.BusinessException;
 import ma.microtech.smartshop.exception.ForbiddenException;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,13 +111,15 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         BigDecimal sousTotalHT = processOrderItems(order, dto.items());
-
         order.setSousTotalHT(sousTotalHT);
 
         calculatesTotalAndDiscounts(order, client);
 
         order = orderRepository.save(order);
         orderItemRepository.saveAll(order.getItems());
+
+        upgradeClientOrderStats(client);
+        clientRepository.save(client);
 
         return orderMapper.toResponseDTO(order);
     }
@@ -156,7 +161,7 @@ public class OrderServiceImpl implements OrderService {
 
     private void calculatesTotalAndDiscounts(Order order, Client client){
         BigDecimal sousTotalHT = order.getSousTotalHT();
-        BigDecimal tierDiscount = client.getTier().getDiscountPercentage();
+        BigDecimal tierDiscount = client.getTier().getDiscountPercent(sousTotalHT);
         BigDecimal promoDiscount = BigDecimal.ZERO;
         String code = order.getCodePromo();
 
@@ -186,5 +191,92 @@ public class OrderServiceImpl implements OrderService {
         order.setMontantTVA(montantTVA);
         order.setTotalTTC(totalTTC);
         order.setMontantRestant(totalTTC);
+    }
+
+    @Override
+    @Transactional
+    public OrderResponseDTO updateOrderStatus(Long id, OrderStatus newStatus){
+        checkAdmin();
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order Not Found"));
+
+        if(order.getStatus() == OrderStatus.REJECTED || order.getStatus() == OrderStatus.CANCELED || order.getStatus() == OrderStatus.CONFIRMED){
+            throw new BusinessException("Cannot modify order in final state: " + order.getStatus());
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new BusinessException("Order is not in PENDING state");
+        }
+
+        switch (newStatus){
+            case CANCELED -> cancelOrder(order);
+            case CONFIRMED -> confirmOrder(order);
+            default -> throw new BusinessException("Invalid status transition to: " + newStatus);
+        }
+
+        order = orderRepository.save(order);
+        return orderMapper.toResponseDTO(order);
+    }
+
+    private void confirmOrder(Order order){
+        Client client = order.getClient();
+        BigDecimal totalSpent = client.getTotalSpent() != null ? client.getTotalSpent() : BigDecimal.ZERO;
+
+        client.setTotalSpent(totalSpent.add(order.getTotalTTC()));
+        upgradeClientTier(client);
+        clientRepository.save(client);
+
+        order.setStatus(OrderStatus.CONFIRMED);
+        order.setMontantRestant(BigDecimal.ZERO);
+    }
+
+    private void cancelOrder(Order order){
+        for (OrderItem item : order.getItems()){
+            Product product = item.getProduct();
+            product.setStock(product.getStock() + item.getQuantity());
+            productRepository.save(product);
+        }
+
+        Client client = order.getClient();
+        if(client.getTotalOrders() != null && client.getTotalOrders() > 0){
+            client.setTotalOrders(client.getTotalOrders() - 1);
+        }
+
+        order.setStatus(OrderStatus.CANCELED);
+    }
+
+    private void upgradeClientTier(Client client){
+        BigDecimal totalSpent = client.getTotalSpent() != null ? client.getTotalSpent() : BigDecimal.ZERO;
+        Integer orderCount = client.getTotalOrders() != null ? client.getTotalOrders() : 0;
+
+
+        CustomerTier newTier = CustomerTier.BASIC;
+
+        if (orderCount >= 20 || totalSpent.compareTo(BigDecimal.valueOf(15000)) >= 0) {
+            newTier = CustomerTier.PLATINUM;
+        }
+        else if (orderCount >= 10 || totalSpent.compareTo(BigDecimal.valueOf(5000)) >= 0) {
+            newTier = CustomerTier.GOLD;
+        }
+        else if (orderCount >= 3 || totalSpent.compareTo(BigDecimal.valueOf(1000)) >= 0) {
+            newTier = CustomerTier.SILVER;
+        }
+
+        if (client.getTier() != newTier) {
+            client.setTier(newTier);
+        }
+    }
+
+    private void upgradeClientOrderStats(Client client){
+        Integer currentorders = client.getTotalOrders() != null ? client.getTotalOrders() : 0;
+        client.setTotalOrders(currentorders + 1);
+
+        LocalDate today = LocalDate.now();
+
+        if(client.getFirstOrderDate() == null){
+            client.setFirstOrderDate(today);
+        }
+
+        client.setLastOrderDate(today);
     }
 }
