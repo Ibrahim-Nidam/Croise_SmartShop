@@ -149,7 +149,14 @@ public class ClientServiceImpl implements ClientService {
             throw new ForbiddenException("You can view only your History");
         }
 
-        return Collections.emptyList();
+        return client.getOrders().stream()
+                .map(order -> new OrderSummaryDTO(
+                        order.getId(),
+                        order.getDateCreation(),
+                        order.getTotalTTC(),
+                        order.getStatus()
+                ))
+                .toList();
     }
 
     @Override

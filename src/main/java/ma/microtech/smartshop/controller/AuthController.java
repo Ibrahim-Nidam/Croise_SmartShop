@@ -3,6 +3,7 @@ package ma.microtech.smartshop.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.entity.User;
+import ma.microtech.smartshop.exception.UnauthorizedException;
 import ma.microtech.smartshop.service.interfaces.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest req){
         if(authService.getCurrentUser(req) == null){
-            throw new IllegalStateException();
+            throw new UnauthorizedException("You are not authenticated");
         }
         authService.logout(req);
         return ResponseEntity.ok(new LogoutResponse("Logged out successfully"));
