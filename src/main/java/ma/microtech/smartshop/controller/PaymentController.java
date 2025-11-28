@@ -1,5 +1,6 @@
 package ma.microtech.smartshop.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.dto.payment.PaymentRequestDTO;
@@ -8,6 +9,8 @@ import ma.microtech.smartshop.dto.payment.UpdatePaymentStatusRequestDTO;
 import ma.microtech.smartshop.service.interfaces.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -25,6 +28,12 @@ public class PaymentController {
     public ResponseEntity<PaymentResponseDTO> updateStatus(@PathVariable Long paymentId, @Valid @RequestBody UpdatePaymentStatusRequestDTO dto){
         PaymentResponseDTO responseDTO = paymentService.updatePaymentStatus(paymentId, dto.status(), dto.dateEncaissement());
         return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping("/orders/{orderId}/payments")
+    public ResponseEntity<List<PaymentResponseDTO>> getPaymentsForOrder(@PathVariable Long orderId, HttpServletRequest request){
+        List<PaymentResponseDTO> payments = paymentService.getPaymentsByOrderId(orderId, request);
+        return ResponseEntity.ok(payments);
     }
 }
 
