@@ -7,4 +7,5 @@ import ma.microtech.smartshop.enums.OrderStatus;
 public interface OrderService {
     OrderResponseDTO createOrder(OrderCreateRequestDTO dto);
     OrderResponseDTO updateOrderStatus(Long id, OrderStatus status);
+    OrderResponseDTO getById(Long id);
 }

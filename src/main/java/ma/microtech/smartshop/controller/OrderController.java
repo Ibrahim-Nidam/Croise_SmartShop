@@ -24,6 +24,11 @@ public class OrderController {
         return ResponseEntity.ok(orderService.createOrder(dto));
     }
 
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponseDTO> getOrder(@PathVariable Long orderId){
+        return ResponseEntity.ok(orderService.getById(orderId));
+    }
+
     @PutMapping("/{id}/status")
     public ResponseEntity<OrderResponseDTO> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body){
         String statusStr = body.get("status");
