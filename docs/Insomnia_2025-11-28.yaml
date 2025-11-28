@@ -1,0 +1,880 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Croise
+meta:
+  id: wrk_169cf3de1c8d4febb3ced841f11f174b
+  created: 1763983151455
+  modified: 1763983151455
+  description: ""
+collection:
+  - url: "{{ _.in }}auth/logout"
+    name: Logout
+    meta:
+      id: req_de02d3ccfe5b49f8a073037275e38a11
+      created: 1763994052146
+      modified: 1763994080697
+      isPrivate: false
+      description: ""
+      sortKey: -1763684385497
+    method: POST
+    body:
+      mimeType: application/json
+      text: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/12.0.0
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - name: ADMIN
+    meta:
+      id: fld_2965b71bccbb4d4e96eaaa3cc1ca6aba
+      created: 1763983197362
+      modified: 1764258450036
+      sortKey: -1763983197362
+      description: ""
+    children:
+      - url: "{{ _.in }}auth/login"
+        name: Login Admin
+        meta:
+          id: req_d339399096a14d64997642605242892f
+          created: 1763983209607
+          modified: 1764258408908
+          isPrivate: false
+          description: ""
+          sortKey: -1764153055134
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "username": "admin",
+                "password": "admin"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - name: Client Endpoints
+        meta:
+          id: fld_7117ff3530264dbd9ff10c10672fce48
+          created: 1764069078299
+          modified: 1764069078299
+          sortKey: -1764069078299
+          description: ""
+        children:
+          - url: "{{ _.client }}"
+            name: Create Client
+            meta:
+              id: req_6d0267b0b42642af844c98b9ec4fa34f
+              created: 1764013503701
+              modified: 1764338937718
+              isPrivate: false
+              description: ""
+              sortKey: -1764069107111
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                   "name": "dzia",
+                    "email": "a@ha.com",
+                    "password": "client123"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.client }}/5"
+            name: update Client
+            meta:
+              id: req_c344d09dc9774578acaddcf12c5fd62b
+              created: 1764017141944
+              modified: 1764069121420
+              isPrivate: false
+              description: ""
+              sortKey: -1764069106911
+            method: PUT
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                   "name": "dzia",
+                    "email": "contddzzzhuact@techhplgus.ma",
+                    "password": "client123"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.client }}/5"
+            name: get specific Client
+            meta:
+              id: req_a92819f0c18746579a92bede2a826aff
+              created: 1764062378412
+              modified: 1764069127161
+              isPrivate: false
+              description: ""
+              sortKey: -1764069106811
+            method: GET
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                   "name": "dzia",
+                    "email": "contddzzzhuact@techhplgus.ma",
+                    "password": "client123"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.client }}/5"
+            name: delete Client
+            meta:
+              id: req_0ee68a215d76463e9e7d7b5cea257ca2
+              created: 1764062411137
+              modified: 1764069132347
+              isPrivate: false
+              description: ""
+              sortKey: -1764069106611
+            method: DELETE
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                   "name": "dzia",
+                    "email": "contddzzzhuact@techhplgus.ma",
+                    "password": "client123"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.client }}/1/orders"
+            name: get specific Client order history
+            meta:
+              id: req_66a416d0be7f424893789a4bff34d017
+              created: 1764068206808
+              modified: 1764338971810
+              isPrivate: false
+              description: ""
+              sortKey: -1764069106711
+            method: GET
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                   "name": "dzia",
+                    "email": "contddzzzhuact@techhplgus.ma",
+                    "password": "client123"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.client }}"
+            name: get all Clients
+            meta:
+              id: req_961d0409a84546c3819c2feff0b1f7c7
+              created: 1764337525249
+              modified: 1764337525249
+              isPrivate: false
+              description: ""
+              sortKey: -1764069106961
+            method: GET
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                   "name": "dzia",
+                    "email": "contddzzzhuact@techhplgus.ma",
+                    "password": "client123"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Product Endpoints
+        meta:
+          id: fld_20268b868ec8449c864f559bde7e3ad7
+          created: 1764069162916
+          modified: 1764069170761
+          sortKey: -1764069078499
+          description: ""
+        children:
+          - url: "{{ _.product }}"
+            name: Create product
+            meta:
+              id: req_819c2253320745c2bedd9a0f7123a551
+              created: 1764076910570
+              modified: 1764192426063
+              isPrivate: false
+              description: ""
+              sortKey: -1764076913916
+            method: POST
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "name": "Logitech MX Master S",
+                  "pricePerUnit": 89.99,
+                  "stock": 120
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.product }}/1"
+            name: update product
+            meta:
+              id: req_d2e619fa001b4f48aed6f5b3bfb63610
+              created: 1764077229690
+              modified: 1764339042388
+              isPrivate: false
+              description: ""
+              sortKey: -1764073010513.5
+            method: PUT
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "name": "Logitech MX Master 5",
+                  "pricePerUnit": 999.49,
+                  "stock": 88
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.product }}?page=0&size=20"
+            name: products with pagination
+            meta:
+              id: req_0383feae39504a458c9ace4e8b8f9bca
+              created: 1764080270094
+              modified: 1764338562866
+              isPrivate: false
+              description: ""
+              sortKey: -1764073986364.125
+            method: GET
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "name": "Logitech MX Master 3S",
+                  "pricePerUnit": 899.99,
+                  "stock": 120
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.product }}?name=4"
+            name: products with search by name
+            meta:
+              id: req_1261c11df30e44329ea813ae05417b85
+              created: 1764080329652
+              modified: 1764080345318
+              isPrivate: false
+              description: ""
+              sortKey: -1764073498438.8125
+            method: GET
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "name": "Logitech MX Master 3S",
+                  "pricePerUnit": 899.99,
+                  "stock": 120
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.product }}?stock=88"
+            name: products with search by stock
+            meta:
+              id: req_b121346484af4a8fa54325cd611ad0ab
+              created: 1764080491774
+              modified: 1764080501380
+              isPrivate: false
+              description: ""
+              sortKey: -1764073254476.1562
+            method: GET
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "name": "Logitech MX Master 3S",
+                  "pricePerUnit": 899.99,
+                  "stock": 120
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.product }}/8"
+            name: delete product
+            meta:
+              id: req_c8332e43203c47cc86af35582d61a3c5
+              created: 1764085813164
+              modified: 1764339059271
+              isPrivate: false
+              description: ""
+              sortKey: -1764071058812.25
+            method: DELETE
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "name": "Logitech MX Master 5",
+                  "pricePerUnit": 999.49,
+                  "stock": 88
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.product }}"
+            name: get All product
+            meta:
+              id: req_e6d24eee4dca4771a6393b4d79379aeb
+              created: 1764337561427
+              modified: 1764337561427
+              isPrivate: false
+              description: ""
+              sortKey: -1764074474289.4375
+            method: GET
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "name": "Logitech MX Master 3S",
+                  "pricePerUnit": 899.99,
+                  "stock": 120
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Order Endpoint
+        meta:
+          id: fld_49d0ae36714e46a0a193ce05132503c1
+          created: 1764153055034
+          modified: 1764153055034
+          sortKey: -1764153055034
+          description: ""
+        children:
+          - url: "{{ _.orders }}"
+            name: Create order
+            meta:
+              id: req_002ddccf349e43d38c8cd118a0e28474
+              created: 1764153199460
+              modified: 1764339092101
+              isPrivate: false
+              description: ""
+              sortKey: -1764153206365
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                    "clientId": 4,
+                    "items": [
+                        { "productId": 1, "quantity": 2 },
+                				{ "productId": 6, "quantity": 2 }
+                    ],
+                    "codePromo": "PROMO-XTRA"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.orders }}"
+            name: Create order promo doesn't work
+            meta:
+              id: req_113abc7bbacb427f92d063e87396ed84
+              created: 1764169680853
+              modified: 1764169680853
+              isPrivate: false
+              description: ""
+              sortKey: -1764115060140.5
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                    "clientId": 1,
+                    "items": [
+                        { "productId": 4, "quantity": 2 },
+                				{ "productId": 5, "quantity": 2 }
+                    ],
+                    "codePromo": "PROMO-TEST99"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.orders }}/34/status"
+            name: update order status CONFIRMED
+            meta:
+              id: req_511fbc3c107c4e0dae514105a56e65c2
+              created: 1764191398245
+              modified: 1764339105823
+              isPrivate: false
+              description: ""
+              sortKey: -1764134133252.75
+            method: PUT
+            body:
+              mimeType: application/json
+              text: '{ "status": "CONFIRMED" }'
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.orders }}/34/status"
+            name: update order status CANCELED
+            meta:
+              id: req_e14088c801264c3b86e12d46cacaf84f
+              created: 1764191435817
+              modified: 1764319433096
+              isPrivate: false
+              description: ""
+              sortKey: -1764124596696.625
+            method: PUT
+            body:
+              mimeType: application/json
+              text: '{ "status": "CANCELED" }'
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Payment Endpoints
+        meta:
+          id: fld_096c30bec2734fd692d18a646e01440c
+          created: 1764258426095
+          modified: 1764258429345
+          sortKey: -1764153055084
+          description: ""
+        children:
+          - url: "{{ _.payment }}/38/pay"
+            name: Make a payment
+            meta:
+              id: req_76bad9a331c54e118e39e055768375bb
+              created: 1764258433174
+              modified: 1764339141106
+              isPrivate: false
+              description: ""
+              sortKey: -1764258433174
+            method: POST
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "montant": 3674.94,
+                  "type": "ESPECES"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.1.0
+                description: ""
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.payment }}/10/status"
+            name: change payment status
+            meta:
+              id: req_4b005be5b2774d88ab9025edc0a93261
+              created: 1764279819137
+              modified: 1764339172938
+              isPrivate: false
+              description: ""
+              sortKey: -1764205819769.5
+            method: PUT
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "status": "ENCAISSE",
+                  "dateEncaissement": "2025-11-27"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/12.1.0
+                description: ""
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.payment }}/orders/32/payments"
+            name: get Payment history
+            meta:
+              id: req_7ec1d10fcb64402ebc6bd1de823dc615
+              created: 1764338491183
+              modified: 1764338491183
+              isPrivate: false
+              description: ""
+              sortKey: -1764218973120.625
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/12.1.0
+                description: ""
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+    environment:
+      client: http://localhost:8080/api/clients
+      product: http://localhost:8080/api/products
+      orders: http://localhost:8080/api/orders
+      payment: http://localhost:8080/api/payments
+  - name: CLIENT
+    meta:
+      id: fld_5fdc0673088241c7b6e91e7cc8748b93
+      created: 1763983203676
+      modified: 1764013482987
+      sortKey: -1763983203676
+      description: ""
+    children:
+      - url: "{{ _.in }}auth/login"
+        name: Login Client
+        meta:
+          id: req_94f99cd8484147f6b900154a855c26eb
+          created: 1764015515413
+          modified: 1764337345159
+          isPrivate: false
+          description: ""
+          sortKey: -1764013503801
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "username": "contddzzhuact@techhplgus.ma",
+                "password": "client123"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.client }}/me"
+        name: View Profile
+        meta:
+          id: req_831b615048c14b6aba69f6f4bb228a32
+          created: 1764015714567
+          modified: 1764015805906
+          isPrivate: false
+          description: ""
+          sortKey: -1764015714567
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.client }}/me/orders"
+        name: get my order history
+        meta:
+          id: req_38e5cc06addb41eab6ee5f39794038d0
+          created: 1764068222881
+          modified: 1764068261179
+          isPrivate: false
+          description: ""
+          sortKey: -1764015656047.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/products
+        name: get All product
+        meta:
+          id: req_eeec444ef28246adb700202f1eda7947
+          created: 1764080211716
+          modified: 1764337589071
+          isPrivate: false
+          description: ""
+          sortKey: -1764015685307.25
+        method: GET
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "name": "Logitech MX Master 3S",
+              "pricePerUnit": 899.99,
+              "stock": 120
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/payments/orders/32/payments
+        name: get Payment history
+        meta:
+          id: req_902552ad005b4604969a8946624fe897
+          created: 1764328792906
+          modified: 1764338509052
+          isPrivate: false
+          description: ""
+          sortKey: -1764014579924.25
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    environment:
+      client: http://localhost:8080/api/clients
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_833d25ca683a38d71fe809b716b5fa7c6d305f19
+    created: 1763983151461
+    modified: 1764338887576
+  cookies:
+    - id: 431f03b4-7ec6-48f2-8885-7ceaac127787
+      key: JSESSIONID
+      value: 72A8D3A54677C7B9BCEC4F2E6CC6CA29
+      domain: localhost
+      path: /
+      secure: false
+      httpOnly: true
+      hostOnly: true
+environments:
+  name: Base Environment
+  meta:
+    id: env_833d25ca683a38d71fe809b716b5fa7c6d305f19
+    created: 1763983151459
+    modified: 1763983177825
+    isPrivate: false
+  data:
+    in: http://localhost:8080/api/
