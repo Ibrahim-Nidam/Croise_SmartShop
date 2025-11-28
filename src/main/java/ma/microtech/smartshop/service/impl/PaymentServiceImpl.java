@@ -61,12 +61,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Order findOrderById(Long orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("Commande non trouvée"));
+                .orElseThrow(() -> new NotFoundException("Order Not Found"));
     }
 
     private void validateOrderStatus(Order order) {
         if (order.getStatus() != OrderStatus.PENDING) {
-            throw new BusinessException("Impossible d'ajouter un paiement à une commande non PENDING");
+            throw new BusinessException("Impossible to add paiement to PENDING orders");
         }
     }
 
@@ -83,11 +83,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void validatePaymentAmount(PaymentRequestDTO dto, BigDecimal availableAmount) {
         if (dto.montant().compareTo(availableAmount) > 0) {
-            throw new BusinessException("Le montant dépasse le disponible : " + availableAmount + " DH");
+            throw new BusinessException("The amount exceeds the available balance : " + availableAmount + " DH");
         }
 
         if (dto.type() == PaymentType.ESPECES && dto.montant().compareTo(CASH_LIMIT) > 0) {
-            throw new BusinessException("Paiement en espèces limité à 20 000 DH");
+            throw new BusinessException("Cash payments are limited to 20,000 MAD");
         }
     }
 
@@ -178,5 +178,48 @@ public class PaymentServiceImpl implements PaymentService {
 
     private BigDecimal getValueOrZero(BigDecimal value) {
         return value != null ? value : BigDecimal.ZERO;
+    }
+
+    @Override
+    @Transactional
+    public PaymentResponseDTO updatePaymentStatus(Long paymentId, PaymentStatus newStatus, LocalDate dateEncaissement){
+        Paiement paiement = paiementRepository.findById(paymentId)
+                .orElseThrow(()-> new NotFoundException("Paiement Not Found"));
+
+        Order order = paiement.getOrder();
+
+        if(paiement.getStatus() != PaymentStatus.EN_ATTENTE){
+            throw new BusinessException("Only payments with status PENDING can be modified");
+        }
+
+        if(order.getStatus() != OrderStatus.PENDING){
+            throw new BusinessException("Cannot modify a payment for an order that is not PENDING");
+        }
+
+        BigDecimal montant = paiement.getMontant();
+        BigDecimal currentReserve = getValueOrZero(order.getMontantReserve());
+        BigDecimal currentRestant = getValueOrZero(order.getMontantRestant());
+
+        if(newStatus == PaymentStatus.ENCAISSE){
+            order.setMontantReserve(currentReserve.subtract(montant));
+            order.setMontantRestant(currentRestant.subtract(montant));
+
+            updateClientSpentAndTier(order.getClient(), montant);
+
+            paiement.setStatus(PaymentStatus.ENCAISSE);
+            paiement.setDateEncaissement(dateEncaissement != null ? dateEncaissement : LocalDate.now());
+        } else if (newStatus == PaymentStatus.REJETE) {
+            order.setMontantReserve(currentReserve.subtract(montant));
+            paiement.setStatus(PaymentStatus.REJETE);
+        } else {
+            throw new BusinessException("Invalid status: only PAID or REJECTED is allowed here");
+        }
+
+        paiement = paiementRepository.save(paiement);
+        orderRepository.save(order);
+
+        checkAndConfirmOrder(order);
+
+        return paymentMapper.toResponseDTO(paiement);
     }
 }
