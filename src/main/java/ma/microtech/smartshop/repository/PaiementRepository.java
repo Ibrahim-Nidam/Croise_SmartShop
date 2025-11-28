@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PaiementRepository extends JpaRepository<Paiement, Long> {
-    List<Paiement> findByOrderId(Long orderId);
-    List<Paiement> findByOrderClientIdAndOrderId(Long clientId, Long orderId);
+    List<Paiement> findByOrderIdOrderByDatePaiementDesc(Long orderId);
 }

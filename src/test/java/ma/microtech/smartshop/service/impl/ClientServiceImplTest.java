@@ -7,6 +7,7 @@ import ma.microtech.smartshop.dto.client.ClientUpdateDTO;
 import ma.microtech.smartshop.entity.Client;
 import ma.microtech.smartshop.entity.User;
 import ma.microtech.smartshop.enums.UserRole;
+import ma.microtech.smartshop.exception.ForbiddenException;
 import ma.microtech.smartshop.mapper.ClientMapper;
 import ma.microtech.smartshop.repository.ClientRepository;
 import ma.microtech.smartshop.repository.UserRepository;
@@ -115,5 +116,20 @@ class ClientServiceImplTest {
         verify(clientMapper).updateClientFromDTO(updateDTO, mockClient);
         verify(clientRepository).save(mockClient);
         verify(clientMapper).toResponseDTO(mockClient);
+    }
+
+    @Test
+    void getClientById_ThrowForbiddenException() {
+        Long clientId = 1L;
+        when(authService.hasRole(request, "ADMIN")).thenReturn(false);
+
+        ForbiddenException exception = assertThrows(
+                ForbiddenException.class,
+                () -> clientService.getClientById(clientId)
+        );
+
+        assertEquals("Only Admin can get Client", exception.getMessage());
+        verify(authService).hasRole(request, "ADMIN");
+        verify(clientRepository, never()).findById(anyLong());
     }
 }

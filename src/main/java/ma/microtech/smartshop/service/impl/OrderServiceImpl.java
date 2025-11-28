@@ -279,4 +279,16 @@ public class OrderServiceImpl implements OrderService {
 
         client.setLastOrderDate(today);
     }
+
+    @Override
+    public OrderResponseDTO getById(Long id){
+        if(!authService.hasRole(request, "ADMIN")){
+            throw new ForbiddenException("Only Admin can get Order");
+        }
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Client Not Found"));
+
+        return orderMapper.toResponseDTO(order);
+    }
 }

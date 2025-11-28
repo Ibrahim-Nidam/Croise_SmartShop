@@ -1,5 +1,6 @@
 package ma.microtech.smartshop.service.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import ma.microtech.smartshop.dto.payment.PaymentRequestDTO;
@@ -7,16 +8,19 @@ import ma.microtech.smartshop.dto.payment.PaymentResponseDTO;
 import ma.microtech.smartshop.entity.Client;
 import ma.microtech.smartshop.entity.Order;
 import ma.microtech.smartshop.entity.Paiement;
+import ma.microtech.smartshop.entity.User;
 import ma.microtech.smartshop.enums.CustomerTier;
 import ma.microtech.smartshop.enums.OrderStatus;
 import ma.microtech.smartshop.enums.PaymentStatus;
 import ma.microtech.smartshop.enums.PaymentType;
 import ma.microtech.smartshop.exception.BusinessException;
+import ma.microtech.smartshop.exception.ForbiddenException;
 import ma.microtech.smartshop.exception.NotFoundException;
 import ma.microtech.smartshop.mapper.PaymentMapper;
 import ma.microtech.smartshop.repository.ClientRepository;
 import ma.microtech.smartshop.repository.OrderRepository;
 import ma.microtech.smartshop.repository.PaiementRepository;
+import ma.microtech.smartshop.service.interfaces.AuthService;
 import ma.microtech.smartshop.service.interfaces.OrderService;
 import ma.microtech.smartshop.service.interfaces.PaymentService;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
     private final OrderService orderService;
+    private final AuthService authService;
 
     @Override
     @Transactional
@@ -221,5 +227,27 @@ public class PaymentServiceImpl implements PaymentService {
         checkAndConfirmOrder(order);
 
         return paymentMapper.toResponseDTO(paiement);
+    }
+
+    @Override
+    public List<PaymentResponseDTO> getPaymentsByOrderId(Long orderId, HttpServletRequest request){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order Not Found"));
+
+        User currentUser = authService.getCurrentUser(request);
+        if(currentUser == null){
+            throw new ForbiddenException("Authentication required");
+        }
+
+        if("CLIENT".equals(currentUser.getRole().name())){
+            if(!order.getClient().getUser().getId().equals(currentUser.getId())){
+                throw new ForbiddenException("You can access only your orders");
+            }
+        }
+
+        return paiementRepository.findByOrderIdOrderByDatePaiementDesc(orderId)
+                .stream()
+                .map(paymentMapper::toResponseDTO)
+                .toList();
     }
 }
