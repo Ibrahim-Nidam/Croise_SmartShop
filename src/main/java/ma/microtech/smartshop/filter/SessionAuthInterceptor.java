@@ -24,6 +24,13 @@ public class SessionAuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        if (path.startsWith("/swagger-ui")
+                || path.equals("/swagger-ui.html")
+                || path.startsWith("/v3/api-docs")) {
+            return true;
+        }
+
+
         if(!authService.isAuthenticated(request)){
             throw new UnauthorizedException("Authentication required");
         }
